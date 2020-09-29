@@ -19,6 +19,18 @@ necessary as root):
     make clean install
 
 
+Patches Applied
+---------------
+clipboard
+copyurl
+delkey
+externalpipe
+newterm
+open copied url
+scrollback
+
+You can find those patches here : https://st.suckless.org/patches/
+
 Running st
 ----------
 If you did not install st with make clean install, you must compile
