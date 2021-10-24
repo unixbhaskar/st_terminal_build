@@ -28,7 +28,7 @@ externalpipe
 newterm
 open copied url
 scrollback
-
+st-solarized-both
 You can find those patches here : https://st.suckless.org/patches/
 
 Running st
