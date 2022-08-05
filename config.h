@@ -5,7 +5,7 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
+static char *font = "Liberation Mono:pixelsize=14:antialias=true:autohint=true";
 static int borderpx = 2;
 
 /*
@@ -74,7 +74,9 @@ static unsigned int cursorthickness = 2;
 static int bellvolume = 0;
 
 /* default TERM value */
-char *termname = "st-256color";
+/* char *termname = "st-256color";*/
+
+char *termname = "screen-256color";
 
 /*
  * spaces per tab
@@ -95,55 +97,41 @@ unsigned int tabspaces = 8;
 
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
-       /* solarized dark */
-"#073642",  /*  0: black    */
-"#dc322f",  /*  1: red      */
- "#859900",  /*  2: green    */
-"#b58900",  /*  3: yellow   */
-"#268bd2",  /*  4: blue     */
-"#d33682",  /*  5: magenta  */
-"#2aa198",  /*  6: cyan     */
-"#eee8d5",  /*  7: white    */
-"#002b36",  /*  8: brblack  */
-"#cb4b16",  /*  9: brred    */
-"#586e75",  /* 10: brgreen  */
-"#657b83",  /* 11: bryellow */
-"#839496",  /* 12: brblue   */
-"#6c71c4",  /* 13: brmagenta*/
-"#93a1a1",  /* 14: brcyan   */
-"#fdf6e3",  /* 15: brwhite  */
+	/* 8 normal colors */
+	"black",
+	"red3",
+	"green3",
+	"yellow3",
+	"blue2",
+	"magenta3",
+	"cyan3",
+	"gray90",
 
-};
+	/* 8 bright colors */
+	"gray50",
+	"red",
+	"green",
+	"yellow",
+	"#5c5cff",
+	"magenta",
+	"cyan",
+	"white",
 
-/* Terminal colors for alternate (light) palette */
-static const char *altcolorname[] = {
-  /* solarized light */
-"#eee8d5",  /*  0: black    */
-"#dc322f",  /*  1: red      */
-"#859900",  /*  2: green    */
-"#b58900",  /*  3: yellow   */
-"#268bd2",  /*  4: blue     */
-"#d33682",  /*  5: magenta  */
-"#2aa198",  /*  6: cyan     */
-"#073642",  /*  7: white    */
-"#fdf6e3",  /*  8: brblack  */
-"#cb4b16",  /*  9: brred    */
-"#93a1a1",  /* 10: brgreen  */
-"#839496",  /* 11: bryellow */
-"#657b83",  /* 12: brblue   */
-"#6c71c4",  /* 13: brmagenta*/
-"#586e75",  /* 14: brcyan   */
-"#002b36",  /* 15: brwhite  */
+	[255] = 0,
+
+	/* more colors can be added after 255 to use with DefaultXX */
+	"#cccccc",
+	"#555555",
 };
 
 
 /*
-     * Default colors (colorname index)
-    * foreground, background, cursor, reverse cursor
+ * Default colors (colorname index)
+ * foreground, background, cursor, reverse cursor
  */
-   unsigned int defaultfg = 15;
-   unsigned int defaultbg = 0;
-static unsigned int defaultcs = 15;
+unsigned int defaultfg = 15;
+unsigned int defaultbg = 0;
+static unsigned int defaultcs = 256;
 static unsigned int defaultrcs = 257;
 
 /*
@@ -192,12 +180,19 @@ static MouseShortcut mshortcuts[] = {
 	{ ShiftMask,            Button4, ttysend,        {.s = "\033[5;2~"} },
 	{ XK_ANY_MOD,           Button4, ttysend,        {.s = "\031"} },
 	{ ShiftMask,            Button5, ttysend,        {.s = "\033[6;2~"} },
-	/*{ XK_ANY_MOD,           XK_F6,           swapcolors,    {.i =  0} * },*/
+	{ XK_ANY_MOD,           Button5, ttysend,        {.s = "\005"} },
 };
 
 /* Internal keyboard shortcuts. */
 #define MODKEY Mod1Mask
 #define TERMMOD (ControlMask|ShiftMask)
+
+static char *openurlcmd[] = { "/bin/bash", "-c", "st-urlhandler", "externalpipe", NULL };
+
+static char *copyurlcmd[] = { "/bin/bash", "-c",
+    "tmp=$(sed 's/.*│//g' | tr -d '\n' | grep -aEo '(((http|https|gopher|gemini|ftp|ftps|git)://|www\\.)[a-zA-Z0-9.]*[:]?[a-zA-Z0-9./@$&%?$#=_-~]*)|((magnet:\\?xt=urn:bti...h:)[a-zA-Z0-9]*)' | uniq | sed 's/^www./http:\\/\\/www\\./g' ); IFS=; [ ! -z $tmp ] && echo $tmp | dmenu -i -p 'Copy which url?' -l 10 | tr -d '\n' | xclip -selection...clipboard","externalpipe", NULL };
+
+static char *copyoutput[] = { "/bin/bash", "-c", "st-copyout", "externalpipe", NULL };
 
 static Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
@@ -212,9 +207,14 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
+        { ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
+        { ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
-	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
-	{ ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
+	{ TERMMOD,              XK_Return,      newterm,        {.i =  0} },
+	{ MODKEY,               XK_l,           copyurl,        {.i =  0} },
+        { MODKEY,               XK_l,           externalpipe,   {.v = openurlcmd } },
+        { MODKEY,               XK_y,           externalpipe,   {.v = copyurlcmd } },
+        { MODKEY,               XK_o,           externalpipe,   {.v = copyoutput } },
 };
 
 /*
@@ -232,7 +232,6 @@ static Shortcut shortcuts[] = {
  * * 0: no value
  * * > 0: cursor application mode enabled
  * * < 0: cursor application mode disabled
- *
  * Be careful with the order of the definitions because st searches in
  * this table sequentially, so any XK_ANY_MOD must be in the last
  * position for a key.
@@ -293,7 +292,7 @@ static Key key[] = {
 	{ XK_KP_Delete,     ShiftMask,      "\033[2K",      -1,    0},
 	{ XK_KP_Delete,     ShiftMask,      "\033[3;2~",    +1,    0},
 	{ XK_KP_Delete,     XK_ANY_MOD,     "\033[P",       -1,    0},
-	{ XK_KP_Delete,     XK_ANY_MOD,     "\033[3~",      +1,    0},
+	{ XK_KP_Delete,     XK_ANY_MOD,     "\177",         +1,    0},
 	{ XK_KP_Multiply,   XK_ANY_MOD,     "\033Oj",       +2,    0},
 	{ XK_KP_Add,        XK_ANY_MOD,     "\033Ok",       +2,    0},
 	{ XK_KP_Enter,      XK_ANY_MOD,     "\033OM",       +2,    0},
@@ -361,8 +360,7 @@ static Key key[] = {
 	{ XK_Delete,        ShiftMask,      "\033[2K",      -1,    0},
 	{ XK_Delete,        ShiftMask,      "\033[3;2~",    +1,    0},
 	{ XK_Delete,        XK_ANY_MOD,     "\033[P",       -1,    0},
-	{ XK_Delete,        XK_ANY_MOD,     "\033[3~",      +1,    0},
-	{ XK_BackSpace,     XK_NO_MOD,      "\177",          0,    0},
+	{ XK_Delete,        XK_ANY_MOD,     "\177",         +1,    0},
 	{ XK_BackSpace,     Mod1Mask,       "\033\177",      0,    0},
 	{ XK_Home,          ShiftMask,      "\033[2J",       0,   -1},
 	{ XK_Home,          ShiftMask,      "\033[1;2H",     0,   +1},
