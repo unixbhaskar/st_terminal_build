@@ -76,7 +76,7 @@ static int bellvolume = 0;
 /* default TERM value */
 /* char *termname = "st-256color";*/
 
-char *termname = "screen-256color";
+char *termname = "st-newmade";
 
 /*
  * spaces per tab
@@ -129,10 +129,10 @@ static const char *colorname[] = {
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-unsigned int defaultfg = 15;
-unsigned int defaultbg = 0;
-static unsigned int defaultcs = 256;
-static unsigned int defaultrcs = 257;
+unsigned int defaultfg =12 ;
+unsigned int defaultbg =8 ;
+static unsigned int defaultcs = 14;
+static unsigned int defaultrcs = 15;
 
 /*
  * Default shape of cursor
