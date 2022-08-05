@@ -16,7 +16,7 @@ static int borderpx = 2;
  * 4: value of shell in /etc/passwd
  * 5: value of shell in config.h
  */
-static char *shell = "/bin/sh";
+static char *shell = "/bin/bash";
 char *utmp = NULL;
 /* scroll program: to enable use a string like "scroll" */
 char *scroll = NULL;
@@ -141,8 +141,8 @@ static const char *altcolorname[] = {
      * Default colors (colorname index)
     * foreground, background, cursor, reverse cursor
  */
-   unsigned int defaultfg = 12;
-   unsigned int defaultbg = 8;
+   unsigned int defaultfg = 15;
+   unsigned int defaultbg = 12;
 static unsigned int defaultcs = 14;
 static unsigned int defaultrcs = 15;
 
